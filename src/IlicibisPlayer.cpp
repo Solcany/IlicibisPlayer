@@ -6,22 +6,15 @@ IlicibisPlayer::IlicibisPlayer(){
         yamlReader.load("config.yaml");
         float _audioVolume = yamlReader["audioVolume"].as<float>();
         float _nFramesToSkip = yamlReader["nFramesToSkip"].as<int>();
-        int _screenWidth = yamlReader["screenWidth"].as<int>();
-        int _screenHeight = yamlReader["screenHeight"].as<int>();
         int _camStreamWidth = yamlReader["camStreamWidth"].as<int>();
         int _camStreamHeight = yamlReader["camStreamHeight"].as<int>();
         int _tcpPort = yamlReader["tcpPort"].as<int>();
+        string _videosDirPath = yamlReader["videosDirPath"].as<string>();
+        string _videosExtension = yamlReader["videosExtension"].as<string>();
         string _playScheduledVideos = yamlReader["playScheduledVideos"].as<string>();
         
-        YAML::Node videoNames = yamlReader["videos"];
         YAML::Node scheduledVideoNames = yamlReader["scheduledVideos"];
         // convert yaml nodes to vectors
-        vector<string> _videoPaths;
-        for(int i = 0; i < videoNames.size(); i++) {
-            string name = videoNames[i].as<string>();
-            string path = "./videos/" + name;
-            _videoPaths.push_back(path);
-        }
         vector<string> _scheduledVideoPaths;
         for(int i = 0; i < scheduledVideoNames.size(); i++) {
             string name = scheduledVideoNames[i].as<string>();
@@ -31,25 +24,29 @@ IlicibisPlayer::IlicibisPlayer(){
         // set up the app
         audioVolume = _audioVolume;
         nFramesToSkip = _nFramesToSkip;
-        screenWidth = _screenWidth;
-        screenHeight = _screenHeight;
         camStreamWidth = _camStreamWidth;
         camStreamHeight = _camStreamHeight;
         camStreamBytesSize = camStreamWidth * camStreamHeight * 3;
         tcpPort = _tcpPort;
+        videosDirPath = _videosDirPath;
+        videosExtension = _videosExtension;
         if(_playScheduledVideos == "true") { playScheduledVideos = true; } else { playScheduledVideos = false; }
-        videosTotal = _videoPaths.size();
-        videoPaths = _videoPaths;
         scheduledVideosTotal = _scheduledVideoPaths.size();
         scheduledVideoPaths = _scheduledVideoPaths;
     }
 
     void IlicibisPlayer::setup() {
         setupAppFromYamlConfig();
-        
         tcpServer.setup(tcpPort);
         
+        videosDir.open(videosDirPath);
+        videosDir.allowExt(videosExtension);
+        videosDir.listDir();
+        videosDir.sort();
+        
         appFont.load("./font/IBMPlexMono-Regular.ttf", 18);
+        playerWidth = ofGetWindowWidth();
+        playerHeight = ofGetWindowHeight();
         
         ofSetBackgroundColor(0,0,0);
         //system("python3 /Users/m/documents/_DIGITAL/openframeworks112/apps/myApps/ilicibisPlayer3/py_src/ilicibis_cam_stream.py");
@@ -180,27 +177,33 @@ IlicibisPlayer::IlicibisPlayer(){
             switch(playerSource)
             {
                  case PLAYERZERO:
-                    player0.draw(0,0, screenWidth, screenHeight);
+                    player0.draw(0,0, playerWidth, playerHeight);
                     break;
                  case PLAYERONE:
-                     player1.draw(0,0, screenWidth, screenHeight);
+                     player1.draw(0,0, playerWidth, playerHeight);
                      break;
                     
                 case CAMSTREAM:
                     if( tcpServer.isClientConnected(0) && camStreamTexture.isAllocated()) {
-                        camStreamTexture.draw(0,0, screenWidth, screenHeight);
+                        camStreamTexture.draw(0,0, playerWidth, playerHeight);
                     } else {
                         //ofLogError() << "Cam stream texture is not allocated!";
                     }
                     break;
                  case PLAYERSCHEDULED:
-                     playerScheduled.draw(0,0, screenWidth, screenHeight);
+                     playerScheduled.draw(0,0, playerWidth, playerHeight);
                      break;
                  }
         } else {
             appFont.drawString("IlickIclickIbiteIspit", 80,80);
 
         }
+    }
+
+    void IlicibisPlayer::toggleFullscreen() {
+            ofToggleFullscreen();
+            playerWidth = ofGetWindowWidth();
+            playerHeight = ofGetWindowHeight();
     }
 
     void IlicibisPlayer::setPlayerSource(PlayerSources newSource) {
@@ -298,8 +301,8 @@ IlicibisPlayer::IlicibisPlayer(){
     }
 
     string IlicibisPlayer::getRandomVideoPath()  {
-        int randomIndex = (int) std::round(ofRandom(0, videosTotal-1));
-        string path = videoPaths[randomIndex];
+        int randomIndex = (int) std::round(ofRandom(0, videosDir.size()-1));
+        string path = videosDir.getPath(randomIndex);
         ofLog() << "loading path: " << path;
         return path;
     }

@@ -36,7 +36,7 @@ void ofApp::keyReleased(int key) {
             ilicibis.start();
             break;
         case('f'):
-            ofToggleFullscreen();
+            ilicibis.toggleFullscreen();
             break;
         case('q'):
             ofExit();

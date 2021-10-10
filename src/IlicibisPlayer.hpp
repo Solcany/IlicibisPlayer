@@ -15,27 +15,30 @@ class IlicibisPlayer {
         void draw();
         void triggerScheduledVideo();
         void toggleCameraStream();
+        void toggleFullscreen();
         void closeServer();
         //ofTexture udpTexture;
         IlicibisPlayer();
     private:
         ofxYAML yamlReader;
-
+        ofDirectory videosDir;
+    
         // config
         float audioVolume;
         int nFramesToSkip;
-        int screenWidth;
-        int screenHeight;
         int camStreamWidth;
         int camStreamHeight;
+        int playerWidth;
+        int playerHeight;
         int camStreamBytesSize;
         int tcpPort;
         bool playScheduledVideos;
-        
+        string videosDirPath;
+        string videosExtension;
+
         ofxTCPServer tcpServer;
     
         ofTrueTypeFont appFont;
-        vector<string> videoPaths;
         vector<string> scheduledVideoPaths;
         int videosTotal = 0;
         int scheduledVideosTotal = 0;
@@ -54,7 +57,7 @@ class IlicibisPlayer {
         PlayerStates playerState = PAUSED;
         PlayerSources playerSource = PLAYERZERO;
         PlayerSources lastPlayerSource;
-
+        
         void setupAppFromYamlConfig();
         void setPlayerState(PlayerStates newState);
         void setPlayerSource(PlayerSources newSource);
