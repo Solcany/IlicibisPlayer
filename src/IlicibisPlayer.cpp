@@ -9,9 +9,13 @@ IlicibisPlayer::IlicibisPlayer(){
         int _camStreamWidth = yamlReader["camStreamWidth"].as<int>();
         int _camStreamHeight = yamlReader["camStreamHeight"].as<int>();
         int _tcpPort = yamlReader["tcpPort"].as<int>();
+        float _camStreamDelay = yamlReader["camStreamDelay"].as<float>();
+        float _camStreamDuration = yamlReader["camStreamDuration"].as<float>();
         string _videosDirPath = yamlReader["videosDirPath"].as<string>();
+        string _playerName = yamlReader["playerName"].as<string>();
         string _videosExtension = yamlReader["videosExtension"].as<string>();
         string _playScheduledVideos = yamlReader["playScheduledVideos"].as<string>();
+        string _isCameraStreamScheduled = yamlReader["isCameraStreamScheduled"].as<string>();
         
         YAML::Node scheduledVideoNames = yamlReader["scheduledVideos"];
         // convert yaml nodes to vectors
@@ -27,10 +31,14 @@ IlicibisPlayer::IlicibisPlayer(){
         camStreamWidth = _camStreamWidth;
         camStreamHeight = _camStreamHeight;
         camStreamBytesSize = camStreamWidth * camStreamHeight * 3;
+        camStreamDelay = _camStreamDelay;
+        camStreamDuration = _camStreamDuration;
         tcpPort = _tcpPort;
+        playerName = _playerName;
         videosDirPath = _videosDirPath;
         videosExtension = _videosExtension;
         if(_playScheduledVideos == "true") { playScheduledVideos = true; } else { playScheduledVideos = false; }
+        if(_isCameraStreamScheduled == "true") { isCameraStreamScheduled = true; } else { isCameraStreamScheduled = false; }
         scheduledVideosTotal = _scheduledVideoPaths.size();
         scheduledVideoPaths = _scheduledVideoPaths;
     }
@@ -38,7 +46,6 @@ IlicibisPlayer::IlicibisPlayer(){
     void IlicibisPlayer::setup() {
         setupAppFromYamlConfig();
         tcpServer.setup(tcpPort);
-        
         videosDir.open(videosDirPath);
         videosDir.allowExt(videosExtension);
         videosDir.listDir();
@@ -64,15 +71,21 @@ IlicibisPlayer::IlicibisPlayer(){
         playerScheduled.setLoopState(OF_LOOP_NONE);
         playerScheduled.setVolume(audioVolume);
         playerScheduled.setPaused(true);
+        ofLog() << playerName <<  ": press S to start";
     }
 
     void IlicibisPlayer::start() {
+        ofLog() << playerName <<  " is starting...";
+        lastCamStreamTime = ofGetElapsedTimef();
+        //lastCameraStreamTime = ofGetElapsedTimef() + cameraStreamDelay;
         switch(playerSource)
         {
             case PLAYERZERO:
+                ofLog() << playerName <<  " is playing: " << player0.getMoviePath();
                 player0.play();
                 break;
             case PLAYERONE:
+                ofLog() << playerName <<  " is playing: " << player1.getMoviePath();
                 player1.play();
                 break;
         }
@@ -80,12 +93,14 @@ IlicibisPlayer::IlicibisPlayer(){
     }
 
     void IlicibisPlayer::update() {
+        
         if(playerState == RUNNING) {
              switch(playerSource)
              {
                  case PLAYERZERO:
                      if(player0.getCurrentFrame() > player0.getTotalNumFrames()-nFramesToSkip && !player0TriggeredNext) {
                         player1.play();
+                        ofLog() << playerName <<  " is playing: " << player1.getMoviePath();
                         setPlayerSource(PLAYERONE);
                         setLastPlayerSource(PLAYERONE);
                         player0.closeMovie();
@@ -95,7 +110,6 @@ IlicibisPlayer::IlicibisPlayer(){
                         // skip 2 frames to avoid black background when transitioning to the next video
                         player0.setFrame(2);
                         player0.setPaused(true);
-                        std::cout << "starting player 1" << std::endl;
                         // block this code block from running again
                         player0TriggeredNext = true;
                         // unblock code block of the other player
@@ -108,10 +122,9 @@ IlicibisPlayer::IlicibisPlayer(){
                  case PLAYERONE:
                     if(player1.getCurrentFrame() > player1.getTotalNumFrames()-nFramesToSkip && !player1TriggeredNext) {
                         player0.play();
+                        ofLog() << playerName <<  " is playing: " << player0.getMoviePath();
                         setPlayerSource(PLAYERZERO);
                         setLastPlayerSource(PLAYERZERO);
-//                    if(player1.getIsMovieDone()) {
-                        std::cout << "player 1 finished" << std::endl;
                         player1.closeMovie();
                         player1.load(getRandomVideoPath());
                         player1.setLoopState(OF_LOOP_NONE);
@@ -119,7 +132,6 @@ IlicibisPlayer::IlicibisPlayer(){
                         // skip 2 frames to avoid black background when transitioning to the next video
                         player1.setFrame(2);
                         player1.setPaused(true);
-                        std::cout << "starting player 0" << std::endl;
                         // block this code block from running again
                         player1TriggeredNext = true;
                         // unblock code block of the other player
@@ -170,6 +182,21 @@ IlicibisPlayer::IlicibisPlayer(){
                      break;
                  }
         }
+        
+        if(isCameraStreamScheduled) {
+            float currentTime = ofGetElapsedTimef();
+            // start cam stream every camStreamDelay seconds
+            if(currentTime >  lastCamStreamTime + camStreamDelay) {
+                toggleCameraStream();
+                isCamStreamOpen = true;
+                lastCamStreamTime = currentTime;
+            }
+            // end cam stream after camStreamDuration seconds
+            if(isCamStreamOpen && currentTime > lastCamStreamTime + camStreamDuration) {
+                toggleCameraStream();
+                isCamStreamOpen = false;
+            }
+        }
     }
     
     void IlicibisPlayer::draw() {
@@ -195,7 +222,12 @@ IlicibisPlayer::IlicibisPlayer(){
                      break;
                  }
         } else {
-            appFont.drawString("IlickIclickIbiteIspit", 80,80);
+            appFont.drawString(playerName, 80,80);
+            if(isCameraStreamScheduled) {
+                appFont.drawString("scheduled mode", 80,115);
+            } else {
+                appFont.drawString("interactive mode", 80,115);
+            }
 
         }
     }
@@ -268,8 +300,12 @@ IlicibisPlayer::IlicibisPlayer(){
                     setPlayerSource(PLAYERZERO);
                     setLastPlayerSource(PLAYERZERO);
                 }
+                // erase old pixels from the camera stream pixel buffer
+                camStreamTexture.clear();
+                camStreamPixels.clear();
             } else {
                 // start cam stream
+                ofLog() << playerName << " is playing: camera stream";
                 tcpServer.send(0, "startStream");
                 PlayerSources lastSource = getLastPlayerSource();
                 if(lastSource == PLAYERZERO) {
@@ -294,6 +330,9 @@ IlicibisPlayer::IlicibisPlayer(){
         }
     }
 
+
+
+
     void IlicibisPlayer::closeServer() {
         tcpServer.send(0, "exitApp");
         tcpServer.disconnectAllClients();
@@ -303,7 +342,6 @@ IlicibisPlayer::IlicibisPlayer(){
     string IlicibisPlayer::getRandomVideoPath()  {
         int randomIndex = (int) std::round(ofRandom(0, videosDir.size()-1));
         string path = videosDir.getPath(randomIndex);
-        ofLog() << "loading path: " << path;
         return path;
     }
     

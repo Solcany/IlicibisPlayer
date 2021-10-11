@@ -1,18 +1,24 @@
+playerName: IlickIclickIbiteIspit
+videosExtension: mp4
 # audioVolume at 0.0 is silence, 1.0 is maximum volume
-# this controls only the app volume, not computer audio volume
-audioVolume: 0.5
-videosExtension: "mp4"
+# this controls only the app volume, not computer volume
+audioVolume: 0.0
+# should camera stream be scheduled or interactive? set to true for scheduled, set to false for interactive
+isCameraStreamScheduled: false 
+# How often should camera stream be shown?
+camStreamDelay: 6 
+# How long should camera stream be?
+camStreamDuration: 3
 
-
-#  don't change these
-videosDirPath: "./videos" 
+#  don't change these 
+videosDirPath: ./videos
 playScheduledVideos: false
 nFramesToSkip: 3
-camStreamWidth: 640
-camStreamHeight: 360
+camStreamWidth: 640 #320
+camStreamHeight: 480 #240
 tcpPort: 5011
 
-# videos scheduling isn't fully implemented yet, don't change these
+# videos scheduling isn't fully implemented yet, don't change thi
 scheduledVideos:
   - 1.mp4
   - 2.mp4

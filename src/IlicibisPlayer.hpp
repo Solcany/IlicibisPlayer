@@ -23,7 +23,7 @@ class IlicibisPlayer {
         ofxYAML yamlReader;
         ofDirectory videosDir;
     
-        // config
+        // ilicibis config
         float audioVolume;
         int nFramesToSkip;
         int camStreamWidth;
@@ -32,12 +32,13 @@ class IlicibisPlayer {
         int playerHeight;
         int camStreamBytesSize;
         int tcpPort;
-        bool playScheduledVideos;
+        string playerName;
         string videosDirPath;
         string videosExtension;
-
-        ofxTCPServer tcpServer;
     
+        // ilicibis vars
+        bool playScheduledVideos;
+        ofxTCPServer tcpServer;
         ofTrueTypeFont appFont;
         vector<string> scheduledVideoPaths;
         int videosTotal = 0;
@@ -51,13 +52,21 @@ class IlicibisPlayer {
         bool playerScheduledTriggeredNext = false;
         ofTexture camStreamTexture;
         ofPixels camStreamPixels;
+        // the ones below are only used when cam stream is scheduled (instead of being interactive)
+        float camStreamDelay;
+        float camStreamDuration;
+        float lastCamStreamTime;
+        bool isCameraStreamScheduled = false;
+        bool isCamStreamOpen = false;
 
+        // ilicibis states
         enum PlayerStates {PAUSED, RUNNING};
         enum PlayerSources {PLAYERZERO, PLAYERONE, PLAYERSCHEDULED, CAMSTREAM};
         PlayerStates playerState = PAUSED;
         PlayerSources playerSource = PLAYERZERO;
         PlayerSources lastPlayerSource;
         
+        // ilicibis functions
         void setupAppFromYamlConfig();
         void setPlayerState(PlayerStates newState);
         void setPlayerSource(PlayerSources newSource);
@@ -65,7 +74,6 @@ class IlicibisPlayer {
         PlayerSources getLastPlayerSource();
         PlayerSources getCurrentPlayerSource();
         string getRandomVideoPath();
-    
 };
 
 #endif
