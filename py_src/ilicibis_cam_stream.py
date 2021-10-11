@@ -7,6 +7,7 @@ import sys
 import errno
 import glob
 import random
+import time
  
 # config 
 camera_cap = cv2.VideoCapture(0)
@@ -24,6 +25,7 @@ def getRandomInteger(n):
 # preload and process background images
 backgrounds = []
 for path in glob.glob("./backgrounds/*.jpg"):
+    print(path)
     im = cv2.imread(path)
     print(im.shape)    
     if(im.shape[0] > cam_stream_height or im.shape[1] > cam_stream_width or
@@ -91,6 +93,9 @@ with mp_selfie_segmentation.SelfieSegmentation(model_selection=1) as selfie_segm
                     segmentation_results = None
                 elif(message == "exitApp"):
                     sys.exit(1)
+            if not isStreaming:
+                time.sleep(1)
+
 
             #if cv2.waitKey(5) & 0xFF == 27:
             #    break

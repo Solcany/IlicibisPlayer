@@ -44,6 +44,8 @@ IlicibisPlayer::IlicibisPlayer(){
     }
 
     void IlicibisPlayer::setup() {
+        ofSetLogLevel(OF_LOG_SILENT);
+        
         setupAppFromYamlConfig();
         tcpServer.setup(tcpPort);
         videosDir.open(videosDirPath);
@@ -56,7 +58,6 @@ IlicibisPlayer::IlicibisPlayer(){
         playerHeight = ofGetWindowHeight();
         
         ofSetBackgroundColor(0,0,0);
-        //system("python3 /Users/m/documents/_DIGITAL/openframeworks112/apps/myApps/ilicibisPlayer3/py_src/ilicibis_cam_stream.py");
         player0.load(getRandomVideoPath());
         player0.setLoopState(OF_LOOP_NONE);
         player0.setVolume(audioVolume);
@@ -75,7 +76,8 @@ IlicibisPlayer::IlicibisPlayer(){
     }
 
     void IlicibisPlayer::start() {
-        ofLog() << playerName <<  " is starting...";
+        std::cout << playerName << " is starting!" << std::endl;
+        //ofLog() << playerName <<  " is starting...";
         lastCamStreamTime = ofGetElapsedTimef();
         //lastCameraStreamTime = ofGetElapsedTimef() + cameraStreamDelay;
         switch(playerSource)
