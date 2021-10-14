@@ -7,7 +7,6 @@ import sys
 import errno
 import glob
 import random
-import time
  
 # config 
 camera_cap = cv2.VideoCapture(0)
@@ -25,9 +24,7 @@ def getRandomInteger(n):
 # preload and process background images
 backgrounds = []
 for path in glob.glob("./backgrounds/*.jpg"):
-    print(path)
     im = cv2.imread(path)
-    print(im.shape)    
     if(im.shape[0] > cam_stream_height or im.shape[1] > cam_stream_width or
        im.shape[0] < cam_stream_height or im.shape[1] < cam_stream_width):
         im = cv2.resize(im, (cam_stream_width, cam_stream_height), interpolation=cv2.INTER_AREA)
@@ -83,19 +80,14 @@ with mp_selfie_segmentation.SelfieSegmentation(model_selection=1) as selfie_segm
                 message = message.decode()
                 message = message.replace('[/TCP]\x00','')
                 if(message == "startStream"):
-                    print("start stream!");
                     isStreaming = True
                 elif(message == "stopStream"):
-                    print("stop stream!");                    
                     isStreaming = False
                     background_index = getRandomInteger(len(backgrounds) - 1)
                     bg_image = backgrounds[background_index]
                     segmentation_results = None
                 elif(message == "exitApp"):
                     sys.exit(1)
-            if not isStreaming:
-                time.sleep(1)
-
 
             #if cv2.waitKey(5) & 0xFF == 27:
             #    break
