@@ -10,8 +10,8 @@ import random
  
 # config 
 camera_cap = cv2.VideoCapture(0)
-cam_stream_width = 640 #320
-cam_stream_height = 480 #240
+cam_stream_width = 1280 #320
+cam_stream_height = 720 #240
 segmentation_confidence = 0.2
 isStreaming = False
 tcp_ip = "127.0.0.1"
