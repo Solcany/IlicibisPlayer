@@ -47,7 +47,9 @@ IlicibisPlayer::IlicibisPlayer(){
     }
 
     void IlicibisPlayer::setup() {
-        ofSetLogLevel(OF_LOG_SILENT);
+        ofSetLogLevel(OF_LOG_FATAL_ERROR);
+        ofSetVerticalSync(false);
+        ofSetFrameRate(25);
         
         setupAppFromYamlConfig();
         if(areKeysBlocked) { ofSetEscapeQuitsApp(false); }
@@ -104,48 +106,50 @@ IlicibisPlayer::IlicibisPlayer(){
              switch(playerSource)
              {
                  case PLAYERZERO:
-                     if(player0.getCurrentFrame() > player0.getTotalNumFrames()-nFramesToSkip && !player0TriggeredNext) {
+                     player0.update();
+                     //if(player0.getCurrentFrame() > player0.getTotalNumFrames()-nFramesToSkip && !player0TriggeredNext) {
+                     if(player0.getIsMovieDone()) {
                         std::cout << playerName << " playing " << player1.getMoviePath() << std::endl;;
                         player1.play();
                         setPlayerSource(PLAYERONE);
                         setLastPlayerSource(PLAYERONE);
                         player0.closeMovie();
-                        player0.load(getRandomVideoPath());
+                        player0.loadAsync(getRandomVideoPath());
                         player0.setLoopState(OF_LOOP_NONE);
                         player0.setVolume(audioVolume);
                         // skip 2 frames to avoid black background when transitioning to the next video
-                        player0.setFrame(2);
+                        //player0.setFrame(2);
                         player0.setPaused(true);
                         // block this code block from running again
-                        player0TriggeredNext = true;
+                        //player0TriggeredNext = true;
                         // unblock code block of the other player
-                        if(player1TriggeredNext) {
-                            player1TriggeredNext = false;
-                        }
+//                        if(player1TriggeredNext) {
+//                            player1TriggeredNext = false;
+//                        }
                      }
-                     player0.update();
                      break;
                  case PLAYERONE:
-                    if(player1.getCurrentFrame() > player1.getTotalNumFrames()-nFramesToSkip && !player1TriggeredNext) {
+                     player1.update();
+                     if(player1.getIsMovieDone()) {
+                        //if(player1.getCurrentFrame() > player1.getTotalNumFrames()-nFramesToSkip && !player1TriggeredNext) {
                         std::cout << playerName << " playing " << player0.getMoviePath() << std::endl;
                         player0.play();
                         setPlayerSource(PLAYERZERO);
                         setLastPlayerSource(PLAYERZERO);
                         player1.closeMovie();
-                        player1.load(getRandomVideoPath());
+                        player1.loadAsync(getRandomVideoPath());
                         player1.setLoopState(OF_LOOP_NONE);
                         player1.setVolume(audioVolume);
                         // skip 2 frames to avoid black background when transitioning to the next video
-                        player1.setFrame(2);
+                        //player1.setFrame(2);
                         player1.setPaused(true);
                         // block this code block from running again
-                        player1TriggeredNext = true;
+                        //player1TriggeredNext = true;
                         // unblock code block of the other player
-                        if(player0TriggeredNext) {
-                            player0TriggeredNext = false;
-                        }
+//                        if(player0TriggeredNext) {
+//                            player0TriggeredNext = false;
+//                        }
                     }
-                    player1.update();
                     break;
                      
                  case CAMSTREAM:
@@ -323,14 +327,14 @@ IlicibisPlayer::IlicibisPlayer(){
                 if(lastSource == PLAYERZERO) {
                     player0.setPaused(true);
                     player0.closeMovie();
-                    player0.load(getRandomVideoPath());
+                    player0.loadAsync(getRandomVideoPath());
                     player0.setLoopState(OF_LOOP_NONE);
                     player0.setVolume(audioVolume);
                     player0.setPaused(true);
                 } else if(lastSource == PLAYERONE) {
                     player1.setPaused(true);
                     player1.closeMovie();
-                    player1.load(getRandomVideoPath());
+                    player1.loadAsync(getRandomVideoPath());
                     player1.setLoopState(OF_LOOP_NONE);
                     player1.setVolume(audioVolume);
                     player1.setPaused(true);
