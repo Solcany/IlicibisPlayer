@@ -19,14 +19,16 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::exit() {
-    ofLog() << "CLOSING SERVER";
+    std::cout << ilicibis.playerName << " exit" << std::endl;
     ilicibis.closeServer();
 }
 
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button) {
-    ilicibis.toggleCameraStream();
+    if(!ilicibis.isCameraStreamScheduled) {
+        ilicibis.toggleCameraStream();
+    }
 }
 
 //--------------------------------------------------------------

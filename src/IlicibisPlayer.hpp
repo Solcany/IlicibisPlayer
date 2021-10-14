@@ -13,10 +13,13 @@ class IlicibisPlayer {
         void start();
         void update();
         void draw();
-        void triggerScheduledVideo();
+//      void triggerScheduledVideo();
         void toggleCameraStream();
         void toggleFullscreen();
         void closeServer();
+    
+        bool isCameraStreamScheduled = false;
+        string playerName;
         //ofTexture udpTexture;
         IlicibisPlayer();
     private:
@@ -32,7 +35,6 @@ class IlicibisPlayer {
         int playerHeight;
         int camStreamBytesSize;
         int tcpPort;
-        string playerName;
         string videosDirPath;
         string videosExtension;
     
@@ -40,28 +42,27 @@ class IlicibisPlayer {
         bool playScheduledVideos;
         ofxTCPServer tcpServer;
         ofTrueTypeFont appFont;
-        vector<string> scheduledVideoPaths;
+//      vector<string> scheduledVideoPaths;
         int videosTotal = 0;
-        int scheduledVideosTotal = 0;
-        int nextScheduledVideoIndex = 0;
+//      int scheduledVideosTotal = 0;
+//      int nextScheduledVideoIndex = 0;
         ofVideoPlayer player0;
         bool player0TriggeredNext = false;
         ofVideoPlayer player1;
         bool player1TriggeredNext = false;
-        ofVideoPlayer playerScheduled;
-        bool playerScheduledTriggeredNext = false;
+//      ofVideoPlayer playerScheduled;
+//      bool playerScheduledTriggeredNext = false;
         ofTexture camStreamTexture;
         ofPixels camStreamPixels;
         // the ones below are only used when cam stream is scheduled (instead of being interactive)
         float camStreamDelay;
         float camStreamDuration;
         float lastCamStreamTime;
-        bool isCameraStreamScheduled = false;
         bool isCamStreamOpen = false;
 
         // ilicibis states
         enum PlayerStates {PAUSED, RUNNING};
-        enum PlayerSources {PLAYERZERO, PLAYERONE, PLAYERSCHEDULED, CAMSTREAM};
+        enum PlayerSources {PLAYERZERO, PLAYERONE, CAMSTREAM}; //{PLAYERZERO, PLAYERONE, PLAYERSCHEDULED, CAMSTREAM};
         PlayerStates playerState = PAUSED;
         PlayerSources playerSource = PLAYERZERO;
         PlayerSources lastPlayerSource;
