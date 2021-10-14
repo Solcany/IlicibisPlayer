@@ -35,13 +35,22 @@ void ofApp::mouseReleased(int x, int y, int button) {
 void ofApp::keyReleased(int key) {
     switch(key) {
         case('s'):
-            ilicibis.start();
+            if(!ilicibis.areKeysBlocked) {
+                ilicibis.start();
+            } else {
+                ilicibis.start();
+                ilicibis.toggleFullscreen();
+            }
             break;
         case('f'):
-            ilicibis.toggleFullscreen();
+            if(!ilicibis.areKeysBlocked) {
+                ilicibis.toggleFullscreen();
+            }
             break;
         case('q'):
-            ofExit();
+            if(!ilicibis.areKeysBlocked) {
+                ofExit();
+            }
             break;
     }
 }

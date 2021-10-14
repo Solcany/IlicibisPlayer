@@ -18,6 +18,7 @@ class IlicibisPlayer {
         void toggleFullscreen();
         void closeServer();
     
+        bool areKeysBlocked;
         bool isCameraStreamScheduled = false;
         string playerName;
         //ofTexture udpTexture;
