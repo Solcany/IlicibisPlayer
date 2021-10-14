@@ -251,6 +251,16 @@ IlicibisPlayer::IlicibisPlayer(){
             playerHeight = ofGetWindowHeight();
     }
 
+    void IlicibisPlayer::toggleCursorVisibility() {
+        if(isCursorVisible) {
+            ofHideCursor();
+            isCursorVisible = false;
+        } else {
+            ofShowCursor();
+            isCursorVisible = true;
+        }
+    }
+
     void IlicibisPlayer::setPlayerSource(PlayerSources newSource) {
         playerSource = newSource;
     }
@@ -327,14 +337,14 @@ IlicibisPlayer::IlicibisPlayer(){
                 if(lastSource == PLAYERZERO) {
                     player0.setPaused(true);
                     player0.closeMovie();
-                    player0.loadAsync(getRandomVideoPath());
+                    player0.load(getRandomVideoPath());
                     player0.setLoopState(OF_LOOP_NONE);
                     player0.setVolume(audioVolume);
                     player0.setPaused(true);
                 } else if(lastSource == PLAYERONE) {
                     player1.setPaused(true);
                     player1.closeMovie();
-                    player1.loadAsync(getRandomVideoPath());
+                    player1.load(getRandomVideoPath());
                     player1.setLoopState(OF_LOOP_NONE);
                     player1.setVolume(audioVolume);
                     player1.setPaused(true);

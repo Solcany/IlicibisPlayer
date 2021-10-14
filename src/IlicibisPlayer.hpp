@@ -16,8 +16,8 @@ class IlicibisPlayer {
 //      void triggerScheduledVideo();
         void toggleCameraStream();
         void toggleFullscreen();
+        void toggleCursorVisibility();
         void closeServer();
-    
         bool areKeysBlocked;
         bool isCameraStreamScheduled = false;
         string playerName;
@@ -60,6 +60,7 @@ class IlicibisPlayer {
         float camStreamDuration;
         float lastCamStreamTime;
         bool isCamStreamOpen = false;
+        bool isCursorVisible = true;
 
         // ilicibis states
         enum PlayerStates {PAUSED, RUNNING};

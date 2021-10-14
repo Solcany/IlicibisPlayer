@@ -10,7 +10,7 @@ camStreamDelay: 6
 # How long should camera stream be?
 camStreamDuration: 3
 # should the exit and fullscreen keyboard presses be blocked?
-areKeysBlocked: true
+areKeysBlocked: false
 
 #  don't change these 
 videosDirPath: ./videos

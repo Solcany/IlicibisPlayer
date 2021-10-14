@@ -52,6 +52,9 @@ void ofApp::keyReleased(int key) {
                 ofExit();
             }
             break;
+        case('h'):
+            ilicibis.toggleCursorVisibility();
+            break;
     }
 }
 
